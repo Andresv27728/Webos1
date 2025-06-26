@@ -1,0 +1,21 @@
+entrypoint = "index.js"
+run = "node index.js"
+modules = ["nodejs-22", "python-3.11"]
+hidden = [".config", "package-lock.json"]
+
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix", "package.json", "package-lock.json"]
+
+[nix]
+channel = "stable-24_11"
+packages = ["lsof", "u-root-cmds"]
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
+localPort = 4000
+externalPort = 80
+
+
