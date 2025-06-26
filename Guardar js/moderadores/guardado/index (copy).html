@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Moderador WhatsApp</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f4f4f4;
+            padding-top: 50px;
+        }
+
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        #qr-img {
+            margin-top: 20px;
+            border: 2px solid #000;
+            border-radius: 8px;
+            display: none;
+        }
+
+        #estado {
+            margin-top: 15px;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Escanea tu QR para moderar tu cuenta</h1>
+    <input type="text" id="usuario" placeholder="Ej: juanito123">
+    <button onclick="iniciarSesion()">Generar QR</button>
+
+    <div id="qr-container">
+        <img id="qr-img" src="" alt="Código QR">
+    </div>
+
+    <div id="estado"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        function iniciarSesion() {
+            const usuario = document.getElementById('usuario').value.trim();
+            if (!usuario) return alert('⚠️ Escribe tu alias de sesión');
+
+            socket.emit('iniciar', usuario);
+            document.getElementById('estado').textContent = '⌛ Generando QR...';
+            document.getElementById('qr-img').style.display = 'none';
+
+            // Mostrar imagen cuando se actualice
+            const img = document.getElementById('qr-img');
+            setInterval(() => {
+                img.src = `/qr/${usuario}.png?t=` + Date.now();
+            }, 5000);
+        }
+
+        socket.on('qr', qr => {
+            const img = document.getElementById('qr-img');
+            img.src = `/qr/${document.getElementById('usuario').value.trim()}.png?t=` + Date.now();
+            img.style.display = 'block';
+        });
+
+        socket.on('estado', msg => {
+            document.getElementById('estado').textContent = msg;
+        });
+    </script>
+</body>
+</html>
